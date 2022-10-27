@@ -1,0 +1,15 @@
+doyto:
+  query:
+    config:
+      dialect: win.doyto.query.dialect.HSQLDBDialect
+      map-camel-case-to-underscore: true
+
+spring:
+  mongodb:
+    embedded:
+      version: 5.0.5
+
+logging:
+  level:
+    org.springframework.web.servlet.mvc.method.annotation: trace
+    win.doyto.query.sql.SqlAndArgs: debug

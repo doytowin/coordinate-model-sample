@@ -1,0 +1,96 @@
+[
+  {
+    "$lookup": {
+      "from": "a_user_and_role",
+      "localField": "_id",
+      "foreignField": "user_id",
+      "pipeline": [
+        {
+          "$lookup": {
+            "from": "t_role",
+            "localField": "role_id",
+            "foreignField": "_id",
+            "as": "roles"
+          }
+        },
+        {
+          "$unwind": "$roles"
+        },
+        {
+          "$replaceRoot": {
+            "newRoot": "$roles"
+          }
+        },
+        {
+          "$project": {
+            "roleName": 1,
+            "valid": 1
+          }
+        }
+      ],
+      "as": "roles"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "a_user_and_role",
+      "localField": "_id",
+      "foreignField": "user_id",
+      "pipeline": [
+        {
+          "$lookup": {
+            "from": "a_role_and_perm",
+            "localField": "role_id",
+            "foreignField": "role_id",
+            "pipeline": [
+              {
+                "$lookup": {
+                  "from": "t_perm",
+                  "localField": "perm_id",
+                  "foreignField": "_id",
+                  "as": "perms"
+                }
+              },
+              {
+                "$unwind": "$perms"
+              },
+              {
+                "$replaceRoot": {
+                  "newRoot": "$perms"
+                }
+              },
+              {
+                "$project": {
+                  "permName": 1,
+                  "valid": 1
+                }
+              }
+            ],
+            "as": "perms"
+          }
+        },
+        {
+          "$unwind": "$perms"
+        },
+        {
+          "$replaceRoot": {
+            "newRoot": "$perms"
+          }
+        }
+      ],
+      "as": "perms"
+    }
+  },
+  {
+    "$sort": {
+      "_id": 1
+    }
+  },
+  {
+    "$project": {
+      "username": "$username",
+      "roles": "$roles",
+      "perms": "$perms"
+    }
+  }
+]
